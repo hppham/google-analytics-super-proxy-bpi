@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Chart</title>  
+    
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});    
+      google.charts.setOnLoadCallback(drawVisualization);
+      
+      function drawVisualization() {
+        var wrapper = new google.visualization.ChartWrapper({
+          chartType: 'LineChart',
+          dataSourceUrl: 'http://localhost:8080/query?id=ahNkZXZ-Z2FuYWx5dGljc3Byb3h5chULEghBcGlRdWVyeRiAgICAgICACgw&format=data-table-response',
+          refreshInterval: 3600,
+          options: {
+            'title': 'Today Active Users',
+            'legend': 'none',
+            'width': '100%',
+            'height': '100%',
+            'lineWidth': '2',
+            'pointSize': '10',
+            'curveType': 'function',
+            'vAxis': {
+              title: 'Number of Uers',
+              format: 'decimal'
+            },
+            'hAxis': {
+              title: 'Time'
+            }
+          },
+          containerId: 'vis_div'
+        });
+        wrapper.draw();
+      }
+    </script>
+  </head>
+    
+  <body style="font-family: Arial;border: 0 none;">
+    <div id="vis_div" style="width: 100%; height: 100%;"></div>
+  </body>
+</html>
