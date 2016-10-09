@@ -18,7 +18,7 @@ from controllers.util import co
 import webapp2
 
 
-class DisplayChart(base.BaseHandler):
+class LineChart(base.BaseHandler):
   """Redirect to the display_chart page."""
 
   def get(self):
@@ -26,5 +26,5 @@ class DisplayChart(base.BaseHandler):
 
 
 app = webapp2.WSGIApplication(
-    [(co.LINKS['line_chart'], DisplayChart)],
+    [(co.LINKS['line_chart'], LineChart)],
     debug=True)

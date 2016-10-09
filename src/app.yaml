@@ -26,8 +26,8 @@ handlers:
   login: required
   secure: always
 
-- url: /charts/line_chart
-  script: controllers.line_chart.app
+- url: /charts.*
+  script: controllers.charts.app
 
 - url: /.*
   script: controllers.public.app
