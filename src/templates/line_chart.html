@@ -29,12 +29,8 @@
             $.each(data.rows, function( index, value ) {
               if (index > currentTime)
                 return false;
-
-              if (value[0] < 12)
-                rows.push([value[0] + ' am', parseInt(value[1]), value[0] + ' am: ' + value[1] + ' active users']);
-              else
-                rows.push([value[0] + ' pm', parseInt(value[1]), value[0] + ' pm: ' + value[1] + ' active users']);
-
+              
+              rows.push([value[0], parseInt(value[1]), value[1] + ' active users at ' + value[0] + ':00']);
             });
 
             return rows;
@@ -58,7 +54,7 @@
               title: 'Today Active Users',              
               width: '100%',
               height: '100%',
-              lineWidth: '2',
+              lineWidth: '1',
               pointSize: '10',
               curveType: 'function',
               vAxis: {
@@ -66,7 +62,7 @@
                 format: 'decimal'
               },
               hAxis: {
-                title: 'Time'
+                title: 'Military Time'
               }
             };
             var chart = new google.visualization.LineChart(document.getElementById('vis_div'));        
