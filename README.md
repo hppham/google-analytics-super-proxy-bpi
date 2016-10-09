@@ -1,4 +1,7 @@
 # Google Analytics superProxy
+Public Charts:
+http://localhost:8080/charts/line_chart
+
 
 The Google Analytics superProxy allows you to publicly share your Google
 Analytics reporting data. Use it to power your own custom dashboards and
