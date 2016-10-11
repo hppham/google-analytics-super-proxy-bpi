@@ -33,15 +33,16 @@ __author__ = 'pete.frisella@gmail.com (Pete Frisella)'
 
 # OAuth 2.0 Client Settings
 AUTH_CONFIG = {
-    'OAUTH_CLIENT_ID': '807476441704-o183v0cr4504a77mpknjr3oh0sr3n0d3.apps.googleusercontent.com',
-    'OAUTH_CLIENT_SECRET': 'mnxDWZPt5Dz9AX-hzBanU_bB',
+    'OAUTH_CLIENT_ID': '716579107097-bai4t8g97arv3ppgpkifav24e19g00st.apps.googleusercontent.com',
+    'OAUTH_CLIENT_SECRET': 'X_IlLVspZt2InuJZOMb673H9',
 
     # E.g. Local Dev Env on port 8080: http://localhost:8080
     # E.g. Hosted on App Engine: https://your-application-id.appspot.com
+    # https://gasuperproxybpi.appspot.com
     'OAUTH_REDIRECT_URI': '%s%s' % (
-        'http://localhost:8080',
+        'https://gasuperproxybpi.appspot.com',
         '/admin/auth')
 }
 
 # XSRF Settings
-XSRF_KEY = '123678676634578634567362376982399'
+XSRF_KEY = '12367867663457863456736237698239912323'

@@ -9,9 +9,10 @@
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
   <script type="text/javascript">
+    //yesterday: https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgNrjhgoM&format=json
     $(document).ready(function () {
       $.ajax({
-        url: 'https://ganalyticsproxy.appspot.com/query?id=ahFzfmdhbmFseXRpY3Nwcm94eXIVCxIIQXBpUXVlcnkYgICAgICAgAoM&format=json',
+        url: 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgICAgAoM&format=json',
         type: 'GET',
         data: {
           format: 'json'
@@ -59,7 +60,7 @@
               isHtml: true
             },
             legend: 'none',
-            title: 'Today Active Users',
+            title: 'Active Users in the last 24 hrs',
             width: '100%',
             height: '100%',
             lineWidth: '1',
