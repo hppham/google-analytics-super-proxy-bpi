@@ -1,80 +1,89 @@
 <!DOCTYPE html>
 
 <html>
-  <head>
-    <title>LineChart</title>  
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    
-    <script type="text/javascript">
-      $( document ).ready(function() {
-        $.ajax({
-          url: 'https://ganalyticsproxy.appspot.com/query?id=ahFzfmdhbmFseXRpY3Nwcm94eXIVCxIIQXBpUXVlcnkYgICAgICAgAoM&format=json',
-          type: 'GET',
-          data: {
-             format: 'json'
-          },
-          dataType: 'jsonp',
-          error: function() {
-             $('#info').html('<p>An error has occurred</p>');
-          },            
-          success: function(data) {             
-            _startGoogleChart(this.getRows(data));
-          },
-          
-          getRows: function(data) {
-            var rows = [];
-            var currentTime = new Date($.now()).getHours();
-            $.each(data.rows, function( index, value ) {
-              if (index > currentTime)
-                return false;
-              
-              rows.push([value[0], parseInt(value[1]), value[1] + ' active users at ' + value[0] + ':00']);
-            });
 
-            return rows;
-          }
-        });                
-        
-        function _startGoogleChart(rows){                  
-          google.charts.load('current', {'packages':['corechart']});    
-          google.charts.setOnLoadCallback(drawChart);
+<head>
+  <title>LineChart</title>
 
-          function drawChart() {
-            var dataTable = new google.visualization.DataTable();
-            dataTable.addColumn('string', 'hour');
-            dataTable.addColumn('number', 'user');
-            dataTable.addColumn({type: 'string', role: 'tooltip'});
-            dataTable.addRows(rows);
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-            var options = {
-              tooltip: {isHtml: true},
-              legend: 'none',
-              title: 'Today Active Users',              
-              width: '100%',
-              height: '100%',
-              lineWidth: '1',
-              pointSize: '10',
-              curveType: 'function',
-              vAxis: {
-                title: 'Number of Uers',
-                format: 'decimal'
-              },
-              hAxis: {
-                title: 'Military Time'
-              }
-            };
-            var chart = new google.visualization.LineChart(document.getElementById('vis_div'));        
-            chart.draw(dataTable, options);
-          }
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $.ajax({
+        url: 'https://ganalyticsproxy.appspot.com/query?id=ahFzfmdhbmFseXRpY3Nwcm94eXIVCxIIQXBpUXVlcnkYgICAgICAgAoM&format=json',
+        type: 'GET',
+        data: {
+          format: 'json'
+        },
+        dataType: 'jsonp',
+        error: function () {
+          $('#info').html('<p>An error has occurred</p>');
+        },
+        success: function (data) {
+          _startGoogleChart(this.getRows(data));
+        },
+
+        getRows: function (data) {
+          var rows = [];
+          var currentTime = new Date($.now()).getHours();
+          $.each(data.rows, function (index, value) {
+            if (index > currentTime)
+              return false;
+
+            rows.push([value[0], parseInt(value[1]), value[1] + ' active users at ' + value[0] + ':00']);
+          });
+
+          return rows;
         }
       });
-    </script>
-  </head>
-    
-  <body style="font-family: Arial;border: 0 none;">
-    <div id="info"></div>
-    <div id="vis_div" style="width: 100%; height: 100%;"></div>
-  </body>
+
+      function _startGoogleChart(rows) {
+        google.charts.load('current', {
+          'packages': ['corechart']
+        });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+          var dataTable = new google.visualization.DataTable();
+          dataTable.addColumn('string', 'hour');
+          dataTable.addColumn('number', 'user');
+          dataTable.addColumn({
+            type: 'string',
+            role: 'tooltip'
+          });
+          dataTable.addRows(rows);
+
+          var options = {
+            tooltip: {
+              isHtml: true
+            },
+            legend: 'none',
+            title: 'Today Active Users',
+            width: '100%',
+            height: '100%',
+            lineWidth: '1',
+            pointSize: '10',
+            curveType: 'function',
+            vAxis: {
+              title: 'Number of Uers',
+              format: 'decimal'
+            },
+            hAxis: {
+              title: 'Military Time'
+            }
+          };
+          var chart = new google.visualization.LineChart(document.getElementById('vis_div'));
+          chart.draw(dataTable, options);
+        }
+      }
+    });
+  </script>
+</head>
+
+<body style="font-family: Arial;border: 0 none;">
+  <div id="info"></div>
+  <div id="vis_div" style="width: 100%; height: 100%;"></div>
+</body>
+
 </html>
