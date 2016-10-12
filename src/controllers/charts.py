@@ -21,8 +21,7 @@ import webapp2
 class LineChart(base.BaseHandler):
   """Redirect to the display_chart page."""
 
-  def get(self):    
-    self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+  def get(self):
     self.RenderHtmlTemplate('line_chart.html')
 
 
