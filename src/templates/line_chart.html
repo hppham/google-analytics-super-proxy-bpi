@@ -38,7 +38,17 @@
 
       $.when(ajaxCallToday, ajaxCallOneDayAgo).done(function (today, oneDayAgo) {
         if (today[1] === "success" && oneDayAgo[1] === "success") {
-          getRows(today[0].rows, oneDayAgo[0].rows.reverse())
+          getRows(today[0].rows, oneDayAgo[0].rows)
+            //          if (rows.count > 0)
+            //            startGoogleChart();
+            //          else
+            //            $('#info').html('<p>An error has occurred</p>');
+          console.log(rows.length);
+          if (rows.length != 24) {
+            $('#info').html('<p>An error has occurred</p>');
+            return;
+          }
+
           startGoogleChart();
         }
       });
@@ -49,9 +59,12 @@
       function getRows(todayRows, oneDayAgoRows) {
         var currentDateTime = new Date($.now());
         var currentTime = currentDateTime.getHours() - 3;
-        if (currentTime > 0) { //only need today and oneDayAgo
+        if (currentTime >= 0) {
           addRows(todayRows, currentTime, ' today', true);
-          addRows(oneDayAgoRows, 24, ' yesterday', false);
+          addRows(oneDayAgoRows.reverse(), 24, ' yesterday', false);
+        } else if (currentTime == -1) {
+          currentTime = 23;
+          addRows(oneDayAgoRows, currentTime, ' yesterday', true);
         } else {
           var ajaxCallTwoDasyAgo = $.ajax({
             url: twoDaysAgoUrl,
@@ -62,6 +75,11 @@
             },
             error: function () {
               $('#info').html('<p>An error has occurred</p>');
+            },
+            success: function (data) {
+              currentTime = currentTime == -2 ? 22 : 21;
+              addRows(oneDayAgoRows, currentTime, ' yesterday', true);
+              addRows(data.rows.reverse(), 24, ' two days ago', false);
             }
           });
         }
