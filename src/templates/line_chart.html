@@ -38,12 +38,7 @@
 
       $.when(ajaxCallToday, ajaxCallOneDayAgo).done(function (today, oneDayAgo) {
         if (today[1] === "success" && oneDayAgo[1] === "success") {
-          getRows(today[0].rows, oneDayAgo[0].rows)
-            //          if (rows.count > 0)
-            //            startGoogleChart();
-            //          else
-            //            $('#info').html('<p>An error has occurred</p>');
-          console.log(rows.length);
+          getRows(today[0].rows, oneDayAgo[0].rows);
           if (rows.length != 24) {
             $('#info').html('<p>An error has occurred</p>');
             return;
