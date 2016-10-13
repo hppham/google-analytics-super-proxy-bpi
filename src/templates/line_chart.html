@@ -35,27 +35,13 @@
           $('#info').html('<p>An error has occurred</p>');
         }
       });
-      var ajaxCallTwoDasyAgo = $.ajax({
-        url: twoDaysAgoUrl,
-        type: 'GET',
-        dataType: 'jsonp',
-        data: {
-          format: 'json'
-        },
-        error: function () {
-          $('#info').html('<p>An error has occurred</p>');
-        }
+
+      $.when(ajaxCallToday, ajaxCallOneDayAgo).done(function (today, oneDayAgo) {
+        if (today[1] === "success" && oneDayAgo[1] === "success")
+          startGoogleChart(getRows(today[0].rows, oneDayAgo[0].rows.reverse()));
       });
 
-
-      $.when(ajaxCallToday, ajaxCallOneDayAgo, ajaxCallTwoDasyAgo).done(function (today, oneDayAgo, twoDaysAgo) {
-        console.log('today: ', today);
-        console.log('oneDayAgo: ', oneDayAgo);
-        console.log('twoDaysAgo: ', twoDaysAgo);
-        startGoogleChart(getRows(today[0].rows, oneDayAgo[0].rows.reverse(), twoDaysAgo[0].rows));
-      });
-
-      function getRows(todayRows, oneDayAgoRows, twoDaysAgoRows) {
+      function getRows(todayRows, oneDayAgoRows) {
         var rows = [];
         var currentDateTime = new Date($.now());
         var currentTime = currentDateTime.getHours() - 3;
@@ -78,9 +64,19 @@
             rows.unshift([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + ' yesterday']);
             counter++;
           });
+        } else {
+          var ajaxCallTwoDasyAgo = $.ajax({
+            url: twoDaysAgoUrl,
+            type: 'GET',
+            dataType: 'jsonp',
+            data: {
+              format: 'json'
+            },
+            error: function () {
+              $('#info').html('<p>An error has occurred</p>');
+            }
+          });
         }
-
-        console.log(rows);
 
         return rows;
       }
