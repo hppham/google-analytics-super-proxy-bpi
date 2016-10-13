@@ -1,44 +1,157 @@
 <!DOCTYPE html>
 
 <html>
-  <head>
-    <title>LineChart</title>  
-    
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});    
-      google.charts.setOnLoadCallback(drawVisualization);
-      
-      function drawVisualization() {
-        var wrapper = new google.visualization.ChartWrapper({
-          chartType: 'LineChart',
-          dataSourceUrl: 'https://ganalyticsproxy.appspot.com/query?id=ahFzfmdhbmFseXRpY3Nwcm94eXIVCxIIQXBpUXVlcnkYgICAgICAgAoM&format=data-table-response',
-          refreshInterval: 3600,
-          options: {
-            'title': 'Today Active Users',
-            'legend': 'none',
-            'width': '100%',
-            'height': '100%',
-            'lineWidth': '2',
-            'pointSize': '10',
-            'curveType': 'function',
-            'vAxis': {
-              title: 'Number of Uers',
-              format: 'decimal'
+
+<head>
+  <title>LineChart</title>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var twoDaysAgoUrl = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgLqojgoM&format=json';
+      var todayUrl = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgICAgAoM&format=json';
+      var oneDayAgoUrl = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgNrjhgoM&format=json';
+      var ajaxCallToday = $.ajax({
+        url: todayUrl,
+        type: 'GET',
+        dataType: 'jsonp',
+        data: {
+          format: 'json'
+        },
+        error: function () {
+          $('#info').html('<p>An error has occurred</p>');
+        }
+      });
+      var ajaxCallOneDayAgo = $.ajax({
+        url: oneDayAgoUrl,
+        type: 'GET',
+        dataType: 'jsonp',
+        data: {
+          format: 'json'
+        },
+        error: function () {
+          $('#info').html('<p>An error has occurred</p>');
+        }
+      });
+
+      $.when(ajaxCallToday, ajaxCallOneDayAgo).done(function (today, oneDayAgo) {
+        if (today[1] === "success" && oneDayAgo[1] === "success") {
+          getRows(today[0].rows, oneDayAgo[0].rows);
+          if (rows.length != 24) {
+            $('#info').html('<p>An error has occurred</p>');
+            return;
+          }
+
+          startGoogleChart();
+        }
+      });
+
+      var counter = 0;
+      var rows = [];
+
+      function getRows(todayRows, oneDayAgoRows) {
+        var currentDateTime = new Date($.now());
+        var currentTime = currentDateTime.getHours() - 3;
+        if (currentTime >= 0) {
+          addRows(todayRows, currentTime, ' today', true);
+          addRows(oneDayAgoRows.reverse(), 24, ' yesterday', false);
+        } else if (currentTime == -1) {
+          currentTime = 23;
+          addRows(oneDayAgoRows, currentTime, ' yesterday', true);
+        } else {
+          var ajaxCallTwoDasyAgo = $.ajax({
+            url: twoDaysAgoUrl,
+            type: 'GET',
+            dataType: 'jsonp',
+            data: {
+              format: 'json'
             },
-            'hAxis': {
-              title: 'Time'
+            error: function () {
+              $('#info').html('<p>An error has occurred</p>');
+            },
+            success: function (data) {
+              currentTime = currentTime == -2 ? 22 : 21;
+              addRows(oneDayAgoRows, currentTime, ' yesterday', true);
+              addRows(data.rows.reverse(), 24, ' two days ago', false);
             }
-          },
-          containerId: 'vis_div'
-        });
-        wrapper.draw();
+          });
+        }
       }
-    </script>
-  </head>
-    
-  <body style="font-family: Arial;border: 0 none;">
-    <div id="vis_div" style="width: 100%; height: 100%;"></div>
-  </body>
+
+      function addRows(originalRows, maxCount, date, isPush) {
+        $.each(originalRows, function (index, value) {
+          if (isPush) {
+            if (index > maxCount)
+              return false;
+          } else {
+            if (counter >= maxCount)
+              return false;
+          }
+
+          var datetime = convertToDateTime(value[0]);
+          if (isPush)
+            rows.push([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
+          else
+            rows.unshift([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
+          counter++;
+        });
+      }
+
+      function convertToDateTime(hours) {
+        var suffix = (hours >= 12) ? 'pm' : 'am';
+        var res = (hours > 12) ? hours - 12 : hours;
+        res = (hours == 0) ? 12 : res;
+
+        return res + suffix;
+      }
+
+      function startGoogleChart() {
+        google.charts.load('current', {
+          'packages': ['corechart']
+        });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+          var dataTable = new google.visualization.DataTable();
+          dataTable.addColumn('string', 'hour');
+          dataTable.addColumn('number', 'user');
+          dataTable.addColumn({
+            type: 'string',
+            role: 'tooltip'
+          });
+          dataTable.addRows(rows);
+
+          var options = {
+            tooltip: {
+              isHtml: true
+            },
+            legend: 'none',
+            title: 'Number of Students Online',
+            width: '100%',
+            height: '100%',
+            lineWidth: '1',
+            pointSize: '10',
+            curveType: 'function',
+            vAxis: {
+              format: 'decimal',
+              gridlines: {
+                count: 5
+              }
+            }
+          };
+          var chart = new google.visualization.LineChart(document.getElementById('vis_div'));
+          chart.draw(dataTable, options);
+        }
+      }
+    });
+  </script>
+</head>
+
+<body style="font-family: Arial;border: 0 none;">
+  <div id="info"></div>
+  <div id="vis_div" style="width: 100%; height: 100%;"></div>
+</body>
+
 </html>
