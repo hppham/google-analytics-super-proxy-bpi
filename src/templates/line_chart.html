@@ -10,10 +10,11 @@
 
   <script type="text/javascript">
     $(document).ready(function () {
-      var _todayUrl = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgICAgAoM&format=json';
-      var _oneDayAgoUrl = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgNrjhgoM&format=json';
+      var twoDaysAgoUrl = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgLqojgoM&format=json';
+      var todayUrl = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgICAgAoM&format=json';
+      var oneDayAgoUrl = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgNrjhgoM&format=json';
       var ajaxCallToday = $.ajax({
-        url: _todayUrl,
+        url: todayUrl,
         type: 'GET',
         dataType: 'jsonp',
         data: {
@@ -24,7 +25,18 @@
         }
       });
       var ajaxCallOneDayAgo = $.ajax({
-        url: _oneDayAgoUrl,
+        url: oneDayAgoUrl,
+        type: 'GET',
+        dataType: 'jsonp',
+        data: {
+          format: 'json'
+        },
+        error: function () {
+          $('#info').html('<p>An error has occurred</p>');
+        }
+      });
+      var ajaxCallTwoDasyAgo = $.ajax({
+        url: twoDaysAgoUrl,
         type: 'GET',
         dataType: 'jsonp',
         data: {
@@ -35,25 +47,53 @@
         }
       });
 
-      $.when(ajaxCallToday, ajaxCallOneDayAgo).done(function (today, oneDayAgo) {
+
+      $.when(ajaxCallToday, ajaxCallOneDayAgo, ajaxCallTwoDasyAgo).done(function (today, oneDayAgo, twoDaysAgo) {
         console.log('today: ', today);
         console.log('oneDayAgo: ', oneDayAgo);
+        console.log('twoDaysAgo: ', twoDaysAgo);
+        startGoogleChart(getRows(today[0].rows, oneDayAgo[0].rows.reverse(), twoDaysAgo[0].rows));
       });
 
-      function _getRows(data) {
+      function getRows(todayRows, oneDayAgoRows, twoDaysAgoRows) {
         var rows = [];
-        var currentTime = new Date($.now()).getHours();
-        $.each(data.rows, function (index, value) {
-          if (index > currentTime)
-            return false;
+        var currentDateTime = new Date($.now());
+        var currentTime = currentDateTime.getHours() - 3;
+        var counter = 0;
+        if (currentTime > 0) { //only need today and oneDayAgo
+          $.each(todayRows, function (index, value) {
+            if (index > currentTime)
+              return false;
 
-          rows.push([value[0], parseInt(value[1]), value[1] + ' active users at ' + value[0] + ':00']);
-        });
+            var datetime = convertToDateTime(value[0]);
+            rows.push([datetime, parseInt(value[1]), value[1] + ' active users at ' + datetime + ' today']);
+            counter++;
+          });
+
+          $.each(oneDayAgoRows, function (index, value) {
+            if (counter >= 24)
+              return false;
+
+            var datetime = convertToDateTime(value[0]);
+            rows.unshift([datetime, parseInt(value[1]), value[1] + ' active users at ' + datetime + ' yesterday']);
+            counter++;
+          });
+        }
+
+        console.log(rows);
 
         return rows;
       }
 
-      function _startGoogleChart(rows) {
+      function convertToDateTime(hours) {
+        var suffix = (hours >= 12) ? 'pm' : 'am';
+        var res = (hours > 12) ? hours - 12 : hours;
+        res = (hours == 0) ? 12 : res;
+
+        return res + suffix;
+      }
+
+      function startGoogleChart(rows) {
         google.charts.load('current', {
           'packages': ['corechart']
         });
@@ -81,11 +121,10 @@
             pointSize: '10',
             curveType: 'function',
             vAxis: {
-              title: 'Number of Students',
-              format: 'decimal'
-            },
-            hAxis: {
-              title: 'Time'
+              format: 'decimal',
+              gridlines: {
+                count: 5
+              }
             }
           };
           var chart = new google.visualization.LineChart(document.getElementById('vis_div'));
