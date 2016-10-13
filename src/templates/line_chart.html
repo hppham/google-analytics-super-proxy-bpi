@@ -37,33 +37,21 @@
       });
 
       $.when(ajaxCallToday, ajaxCallOneDayAgo).done(function (today, oneDayAgo) {
-        if (today[1] === "success" && oneDayAgo[1] === "success")
-          startGoogleChart(getRows(today[0].rows, oneDayAgo[0].rows.reverse()));
+        if (today[1] === "success" && oneDayAgo[1] === "success") {
+          getRows(today[0].rows, oneDayAgo[0].rows.reverse())
+          startGoogleChart();
+        }
       });
 
+      var counter = 0;
+      var rows = [];
+
       function getRows(todayRows, oneDayAgoRows) {
-        var rows = [];
         var currentDateTime = new Date($.now());
         var currentTime = currentDateTime.getHours() - 3;
-        var counter = 0;
         if (currentTime > 0) { //only need today and oneDayAgo
-          $.each(todayRows, function (index, value) {
-            if (index > currentTime)
-              return false;
-
-            var datetime = convertToDateTime(value[0]);
-            rows.push([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + ' today']);
-            counter++;
-          });
-
-          $.each(oneDayAgoRows, function (index, value) {
-            if (counter >= 24)
-              return false;
-
-            var datetime = convertToDateTime(value[0]);
-            rows.unshift([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + ' yesterday']);
-            counter++;
-          });
+          addRows(todayRows, currentTime, ' today', true);
+          addRows(oneDayAgoRows, 24, ' yesterday', false);
         } else {
           var ajaxCallTwoDasyAgo = $.ajax({
             url: twoDaysAgoUrl,
@@ -77,8 +65,25 @@
             }
           });
         }
+      }
 
-        return rows;
+      function addRows(originalRows, maxCount, date, isPush) {
+        $.each(originalRows, function (index, value) {
+          if (isPush) {
+            if (index > maxCount)
+              return false;
+          } else {
+            if (counter >= maxCount)
+              return false;
+          }
+
+          var datetime = convertToDateTime(value[0]);
+          if (isPush)
+            rows.push([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
+          else
+            rows.unshift([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
+          counter++;
+        });
       }
 
       function convertToDateTime(hours) {
@@ -89,7 +94,7 @@
         return res + suffix;
       }
 
-      function startGoogleChart(rows) {
+      function startGoogleChart() {
         google.charts.load('current', {
           'packages': ['corechart']
         });
