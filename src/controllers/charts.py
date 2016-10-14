@@ -22,9 +22,9 @@ class LineChart(base.BaseHandler):
   """Redirect to the display_chart page."""
 
   def get(self):
-    self.RenderHtmlTemplate('line_chart.html')
+    self.RenderHtmlTemplate('column_chart.html')
 
 
 app = webapp2.WSGIApplication(
-    [(co.LINKS['line_chart'], LineChart)],
+    [(co.LINKS['column_chart'], LineChart)],
     debug=True)

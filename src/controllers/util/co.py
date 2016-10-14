@@ -125,7 +125,7 @@ LINKS = {
     'public_default': r'/.*',
     'public_index': '/',
     'public_query': '/query',
-    'line_chart': '/charts/line_chart',
+    'column_chart': '/charts/column_chart',
 
     # Static directories
     'css': '/static/gasuperproxy/css/',
