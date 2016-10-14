@@ -128,16 +128,13 @@
               isHtml: true
             },
             legend: 'none',
-            title: 'Number of Students Online',
+            title: 'Previous 24 hours',
             curveType: 'function',
             vAxis: {
               format: 'decimal',
               gridlines: {
                 count: 5
               }
-            },
-            hAxis: {
-              title: 'Previous 24 hours'
             }
           };
           var chart = new google.visualization.ColumnChart(document.getElementById('vis_div'));
@@ -149,8 +146,11 @@
 </head>
 
 <body style="font-family: Arial;border: 0 none;">
-  <div id="info"></div>
-  <div id="vis_div"></div>
+  <div class="stockInfo">
+    <div class="companyTitle">Number of Students Online</div>
+    <div id="info"></div>
+    <div id="vis_div"></div>
+  </div>
 </body>
 
 </html>
