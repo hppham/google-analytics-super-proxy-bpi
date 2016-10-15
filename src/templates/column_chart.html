@@ -36,13 +36,13 @@
       }
     });
 
-    var gCounter = 0;
-    var gFinalRows = [];
-
     $.when(ajaxCallToday, ajaxCallOneDayAgo).done(function (today, oneDayAgo) {
+      var counter = 0;
+      var finalRows = [];
+
       if (today[1] === "success" && oneDayAgo[1] === "success") {
         getRows(today[0].rows, oneDayAgo[0].rows);
-        if (gFinalRows.length != 24) {
+        if (finalRows.length != 24) {
           $('#info').html('<p>An error has occurred</p>');
           return;
         }
@@ -84,16 +84,16 @@
               if (index > maxCount)
                 return false;
             } else {
-              if (gCounter >= maxCount)
+              if (counter >= maxCount)
                 return false;
             }
 
             var datetime = convertToDateTime(value[0]);
             if (isPush)
-              gFinalRows.push([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
+              finalRows.push([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
             else
-              gFinalRows.unshift([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
-            gCounter++;
+              finalRows.unshift([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
+            counter++;
           });
         }
 
@@ -120,7 +120,7 @@
             type: 'string',
             role: 'tooltip'
           });
-          dataTable.addRows(gFinalRows);
+          dataTable.addRows(finalRows);
 
           var options = {
             tooltip: {
