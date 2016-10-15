@@ -37,12 +37,13 @@
     });
 
     $.when(ajaxCallToday, ajaxCallOneDayAgo).done(function (today, oneDayAgo) {
-      var counter = 0;
+      var MAX_ROWS_COUNT = 24;
+      var totalRowsCount = 0;
       var finalRows = [];
 
       if (today[1] === "success" && oneDayAgo[1] === "success") {
         getRows(today[0].rows, oneDayAgo[0].rows);
-        if (finalRows.length != 24) {
+        if (finalRows.length != MAX_ROWS_COUNT) {
           $('#info').html('<p>An error has occurred</p>');
           return;
         }
@@ -55,7 +56,7 @@
         var currentTime = currentDateTime.getHours() - 3;
         if (currentTime >= 0) {
           addRows(todayRows, currentTime, ' today', true);
-          addRows(oneDayAgoRows.reverse(), 24, ' yesterday', false);
+          addRows(oneDayAgoRows.reverse(), MAX_ROWS_COUNT, ' yesterday', false);
         } else if (currentTime == -1) {
           currentTime = 23;
           addRows(oneDayAgoRows, currentTime, ' yesterday', true);
@@ -73,7 +74,7 @@
             success: function (data) {
               currentTime = currentTime == -2 ? 22 : 21;
               addRows(oneDayAgoRows, currentTime, ' yesterday', true);
-              addRows(data.rows.reverse(), 24, ' two days ago', false);
+              addRows(data.rows.reverse(), MAX_ROWS_COUNT, ' two days ago', false);
             }
           });
         }
@@ -84,7 +85,7 @@
               if (index > maxCount)
                 return false;
             } else {
-              if (counter >= maxCount)
+              if (totalRowsCount >= maxCount)
                 return false;
             }
 
@@ -93,7 +94,7 @@
               finalRows.push([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
             else
               finalRows.unshift([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
-            counter++;
+            totalRowsCount++;
           });
         }
 
@@ -136,6 +137,7 @@
               }
             }
           };
+
           var chart = new google.visualization.ColumnChart(document.getElementById('vis_div'));
           chart.draw(dataTable, options);
         }
