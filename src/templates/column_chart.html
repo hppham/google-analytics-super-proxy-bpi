@@ -9,75 +9,73 @@
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
   <script type="text/javascript">
-    $(document).ready(function () {
-      var twoDaysAgoUrl = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgLqojgoM&format=json';
-      var todayUrl = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgICAgAoM&format=json';
-      var oneDayAgoUrl = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgNrjhgoM&format=json';
-      var ajaxCallToday = $.ajax({
-        url: todayUrl,
-        type: 'GET',
-        dataType: 'jsonp',
-        data: {
-          format: 'json'
-        },
-        error: function () {
-          $('#info').html('<p>An error has occurred</p>');
-        }
-      });
-      var ajaxCallOneDayAgo = $.ajax({
-        url: oneDayAgoUrl,
-        type: 'GET',
-        dataType: 'jsonp',
-        data: {
-          format: 'json'
-        },
-        error: function () {
-          $('#info').html('<p>An error has occurred</p>');
-        }
-      });
+    var TWO_DAYS_AGO_URL = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgLqojgoM&format=json';
+    var TODAY_URL = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgICAgAoM&format=json';
+    var ONE_DAY_AGO_URL = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgNrjhgoM&format=json';
+    var ajaxCallToday = $.ajax({
+      url: TODAY_URL,
+      type: 'GET',
+      dataType: 'jsonp',
+      data: {
+        format: 'json'
+      },
+      error: function () {
+        $('#info').html('<p>An error has occurred</p>');
+      }
+    });
+    var ajaxCallOneDayAgo = $.ajax({
+      url: ONE_DAY_AGO_URL,
+      type: 'GET',
+      dataType: 'jsonp',
+      data: {
+        format: 'json'
+      },
+      error: function () {
+        $('#info').html('<p>An error has occurred</p>');
+      }
+    });
 
-      $.when(ajaxCallToday, ajaxCallOneDayAgo).done(function (today, oneDayAgo) {
-        if (today[1] === "success" && oneDayAgo[1] === "success") {
-          getRows(today[0].rows, oneDayAgo[0].rows);
-          if (rows.length != 24) {
+    var gCounter = 0;
+    var gFinalRows = [];
+
+    $.when(ajaxCallToday, ajaxCallOneDayAgo).done(function (today, oneDayAgo) {
+      if (today[1] === "success" && oneDayAgo[1] === "success") {
+        getRows(today[0].rows, oneDayAgo[0].rows);
+        if (gFinalRows.length != 24) {
+          $('#info').html('<p>An error has occurred</p>');
+          return;
+        }
+
+        startGoogleChart();
+      }
+    });
+
+    function getRows(todayRows, oneDayAgoRows) {
+      var currentDateTime = new Date($.now());
+      var currentTime = currentDateTime.getHours() - 3;
+      if (currentTime >= 0) {
+        addRows(todayRows, currentTime, ' today', true);
+        addRows(oneDayAgoRows.reverse(), 24, ' yesterday', false);
+      } else if (currentTime == -1) {
+        currentTime = 23;
+        addRows(oneDayAgoRows, currentTime, ' yesterday', true);
+      } else {
+        var ajaxCallTwoDasyAgo = $.ajax({
+          url: TWO_DAYS_AGO_URL,
+          type: 'GET',
+          dataType: 'jsonp',
+          data: {
+            format: 'json'
+          },
+          error: function () {
             $('#info').html('<p>An error has occurred</p>');
-            return;
+          },
+          success: function (data) {
+            currentTime = currentTime == -2 ? 22 : 21;
+            addRows(oneDayAgoRows, currentTime, ' yesterday', true);
+            addRows(data.rows.reverse(), 24, ' two days ago', false);
           }
-
-          startGoogleChart();
-        }
-      });
-
-      var counter = 0;
-      var rows = [];
-
-      function getRows(todayRows, oneDayAgoRows) {
-        var currentDateTime = new Date($.now());
-        var currentTime = currentDateTime.getHours() - 3;
-        if (currentTime >= 0) {
-          addRows(todayRows, currentTime, ' today', true);
-          addRows(oneDayAgoRows.reverse(), 24, ' yesterday', false);
-        } else if (currentTime == -1) {
-          currentTime = 23;
-          addRows(oneDayAgoRows, currentTime, ' yesterday', true);
-        } else {
-          var ajaxCallTwoDasyAgo = $.ajax({
-            url: twoDaysAgoUrl,
-            type: 'GET',
-            dataType: 'jsonp',
-            data: {
-              format: 'json'
-            },
-            error: function () {
-              $('#info').html('<p>An error has occurred</p>');
-            },
-            success: function (data) {
-              currentTime = currentTime == -2 ? 22 : 21;
-              addRows(oneDayAgoRows, currentTime, ' yesterday', true);
-              addRows(data.rows.reverse(), 24, ' two days ago', false);
-            }
-          });
-        }
+        });
       }
 
       function addRows(originalRows, maxCount, date, isPush) {
@@ -86,16 +84,16 @@
             if (index > maxCount)
               return false;
           } else {
-            if (counter >= maxCount)
+            if (gCounter >= maxCount)
               return false;
           }
 
           var datetime = convertToDateTime(value[0]);
           if (isPush)
-            rows.push([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
+            gFinalRows.push([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
           else
-            rows.unshift([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
-          counter++;
+            gFinalRows.unshift([datetime, parseInt(value[1]), value[1] + ' online students at ' + datetime + date]);
+          gCounter++;
         });
       }
 
@@ -106,42 +104,42 @@
 
         return res + suffix;
       }
+    }
 
-      function startGoogleChart() {
-        google.charts.load('current', {
-          'packages': ['corechart']
+    function startGoogleChart() {
+      google.charts.load('current', {
+        'packages': ['corechart']
+      });
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var dataTable = new google.visualization.DataTable();
+        dataTable.addColumn('string', 'hour');
+        dataTable.addColumn('number', 'user');
+        dataTable.addColumn({
+          type: 'string',
+          role: 'tooltip'
         });
-        google.charts.setOnLoadCallback(drawChart);
+        dataTable.addRows(gFinalRows);
 
-        function drawChart() {
-          var dataTable = new google.visualization.DataTable();
-          dataTable.addColumn('string', 'hour');
-          dataTable.addColumn('number', 'user');
-          dataTable.addColumn({
-            type: 'string',
-            role: 'tooltip'
-          });
-          dataTable.addRows(rows);
-
-          var options = {
-            tooltip: {
-              isHtml: true
-            },
-            legend: 'none',
-            title: 'Previous 24 hours',
-            curveType: 'function',
-            vAxis: {
-              format: 'decimal',
-              gridlines: {
-                count: 5
-              }
+        var options = {
+          tooltip: {
+            isHtml: true
+          },
+          legend: 'none',
+          title: 'Previous 24 hours',
+          curveType: 'function',
+          vAxis: {
+            format: 'decimal',
+            gridlines: {
+              count: 5
             }
-          };
-          var chart = new google.visualization.ColumnChart(document.getElementById('vis_div'));
-          chart.draw(dataTable, options);
-        }
+          }
+        };
+        var chart = new google.visualization.ColumnChart(document.getElementById('vis_div'));
+        chart.draw(dataTable, options);
       }
-    });
+    }
   </script>
 </head>
 
