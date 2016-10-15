@@ -8,7 +8,19 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
+  <!--Angular Material style sheet-->
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+  <!-- Angular Material requires Angular.js Libraries -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+  <!-- Angular Material Library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+
   <script type="text/javascript">
+    angular.module('ChartApp', ['ngMaterial']);
+
     var TWO_DAYS_AGO_URL = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgLqojgoM&format=json';
     var TODAY_URL = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgICAgAoM&format=json';
     var ONE_DAY_AGO_URL = 'https://gasuperproxybpi.appspot.com/query?id=ahFzfmdhc3VwZXJwcm94eWJwaXIVCxIIQXBpUXVlcnkYgICAgNrjhgoM&format=json';
@@ -140,6 +152,8 @@
 
           var chart = new google.visualization.ColumnChart(document.getElementById('vis_div'));
           chart.draw(dataTable, options);
+
+          $('#progress').hide();
         }
       }
     });
@@ -147,10 +161,14 @@
 </head>
 
 <body style="font-family: Arial;border: 0 none;">
-  <div class="stockInfo">
+  <div class="stockInfo" ng-app="ChartApp" ng-cloak>
     <div class="companyTitle">Number of Students Online</div>
+    <div id="progress" layout="row" layout-align="center" style="margin-top:50px">
+      <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+    </div>
     <div id="info"></div>
-    <div id="vis_div"></div>
+    <div id="vis_div">
+    </div>
   </div>
 </body>
 
